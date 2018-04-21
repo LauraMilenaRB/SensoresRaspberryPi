@@ -29,16 +29,15 @@ def RestRequests():
     header = {'Content-type': 'application/json'}
 
     #Data
-    dat = ('{"temp": "%s","humedad":"%s"}')%(data[0],data[1])
-    petition = requests.post(url+"sensores/DTH", headers = header, data = dat)
+    petition = requests.post(url+"sensores/DHT/"data[0]+"&"+data[1])
     if petition.status_code == 200:
         print(petition.text)
         
     #Data
-    dat = ('{"temp": "%s","humedad":"%s"}')%(data[0],data[1])
-    petition = requests.post(url+"sensores/DTH", headers = header, data = dat)
-    if petition.status_code == 200:
-        print(petition.text)
+    #dat = ('{"temp": "%s","humedad":"%s"}')%(data[0],data[1])
+    #petition = requests.post(url+"sensores/", headers = header, data = dat)
+    #if petition.status_code == 200:
+        #print(petition.text)
         
 def main():
     t = threading.Thread(target=DHT,args=(Adafruit_DHT.DHT11,2))
