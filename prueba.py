@@ -10,12 +10,16 @@ import requests
 import threading
 import time
     
+data=[1,2,3,4]
+
+def DHT11(sensor, pin):
     
-def DHT11():
     while True:
-        humidity, temperature = Adafruit_DHT.read_retry(11, 4)
-        print ('Temp: {0:01f} C  Humidity: {1:01f} %').format(temperature, humidity)
-        time.sleep(1000)
+        temp, hum = Adafruit_DHT.read_retry(sensor, pin)
+        data[0]=round(temp,1)
+        data[1]=round(hum,1)
+        RestRequests()
+        time.sleep(5)
     
     
 def RestRequests():
@@ -31,7 +35,7 @@ def RestRequests():
         print(petition.text)
         
 def main():
-    t = threading.Thread(target=DHT11)
+    t = threading.Thread(target=DHT11(11,2))
     t.start()
     if __name__:"main"
 
