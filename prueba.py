@@ -18,23 +18,27 @@ def DHT(sensor, pin):
         temp, hum = Adafruit_DHT.read_retry(sensor, pin)
         data[0]=round(temp,1)
         data[1]=round(hum,1)
-        print(temp,hum)
         RestRequests()
-        break
+        time.sleep(10)
     
     
 def RestRequests():
     
-    # Definimos la URL
-    url = "https://192.168.0.15/"
+    # URL
+    url = "http://192.168.0.15:8080/"
     header = {'Content-type': 'application/json'}
-    dat = ('{"email": "%s","password":"%s","name":"%s","image":"%s","confirmPassword":"%s"}')%("email","pdw", "name","image","pdw")
-    print("mdfknfoindiofnvfr")
-    petition = requests.post(url+"users/", headers = header, data = dat)
-    print("mdfknfoindiofnvfr2")
+
+    #Data
+    dat = ('{"temp": "%s","humedad":"%s"}')%(data[0],data[1])
+    petition = requests.post(url+"sensores/DTH", headers = header, data = dat)
     if petition.status_code == 200:
         print(petition.text)
-    print("mdfknfoindiofnvfr3")
+        
+    #Data
+    dat = ('{"temp": "%s","humedad":"%s"}')%(data[0],data[1])
+    petition = requests.post(url+"sensores/DTH", headers = header, data = dat)
+    if petition.status_code == 200:
+        print(petition.text)
         
 def main():
     t = threading.Thread(target=DHT,args=(Adafruit_DHT.DHT11,2))
