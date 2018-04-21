@@ -29,7 +29,7 @@ def RestRequests():
     header = {'Content-type': 'application/json'}
 
     #Data
-    petition = requests.post(url+"sensores/DHT/"+data[0]+"&"+data[1])
+    petition = requests.post(url+"sensores/DHT/"+str(data[0])+"&"+str(data[1]))
     if petition.status_code == 200:
         print(petition.text)
         
