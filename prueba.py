@@ -26,11 +26,11 @@ def DHT(sensor, pin):
 def RestRequests():
     
     # Definimos la URL
-    url = "http://192.168.0.15/"
-    print("mdfknfoindiofnvfr")
+    url = "https://192.168.0.15/"
     header = {'Content-type': 'application/json'}
-    dat = ('User:{"email": "%s","password":"%s","name":"%s","image":"%s","confirmPassword":"%s"}')%("email","pdw", "name","image","pdw")
-    petition = requests.post(url+"/users/", headers = header, data = dat)
+    dat = ('{"email": "%s","password":"%s","name":"%s","image":"%s","confirmPassword":"%s"}')%("email","pdw", "name","image","pdw")
+    print("mdfknfoindiofnvfr")
+    petition = requests.post(url+"users/", headers = header, data = dat)
     print("mdfknfoindiofnvfr2")
     if petition.status_code == 200:
         print(petition.text)
