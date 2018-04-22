@@ -19,10 +19,27 @@ def DHT(sensor, pin):
     
     while True:
         temp, hum = Adafruit_DHT.read_retry(sensor, pin)
-        data[0]=str(float(round(temp,1)))
-        data[1]=str(float(round(hum,1)))
-        RestRequestsDHT()
-        time.sleep(15)
+        if(temp!=data[0] or hum!=data[1]):
+            data[0]=str(float(round(temp,1)))
+            data[1]=str(float(round(hum,1)))
+            RestRequestsDHT()
+        time.sleep(12)
+        
+def Water(pin):
+    gpio.setmode(gpio.BOARD)
+    gpio.setup(pin,gpio.IN)
+    try:
+        while True:
+            state=gpio.input(pin)
+            if((data[2]=="true" and state==1) or (data[2]=="true" and state==0)):
+                if not(gpio.input(pin)):
+                    data[2]="true"
+                else:
+                    data[2]="false"
+                RestRequestsWater()
+            time.sleep(8)
+    finally:
+        gpio.cleanup()
         
 def Water(pin):
     gpio.setmode(gpio.BOARD)
@@ -31,7 +48,6 @@ def Water(pin):
         while True:
             if (gpio.input(pin)==0):
                 data[2]="true"
-                RestRequestsWater()
                 print("rain")
     finally:
         gpio.cleanup()
