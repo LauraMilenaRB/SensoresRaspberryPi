@@ -47,8 +47,8 @@ def RestRequestsWater():
         print(petition.text)
         
 def main():
-    t = threading.Thread(target=DHT,args=(Adafruit_DHT.DHT11,2))
-    t2= threading.Thread(target=Water,args=(3))
+    t = threading.Thread(target=DHT,args=(Adafruit_DHT.DHT11,2,))
+    t2= threading.Thread(target=Water,args=(3,))
     t.start()
     t2.start()
     if __name__:"main"
