@@ -10,9 +10,9 @@ import requests
 import threading
 import time
 import RPi.GPIO as gpio
-
+import spidev
     
-data=[" "," "," "," "]
+data=["","","",""]
 
 url = "http://192.168.0.15:8080/sensors/"
 def DHT(sensor, pin):
@@ -30,7 +30,7 @@ def Water(pin):
     try:
         while True:
             state=gpio.input(pin)
-            if((data[2]=="true" and state==1) or (data[2]=="false" and state==0) or (data[2]==" ")):
+            if((data[2]=="true" and state==1) or (data[2]=="false" and state==0) or (data[2]=="")):
                 if not(gpio.input(pin)):
                     data[2]="true"
                 else:
@@ -41,7 +41,7 @@ def Water(pin):
         gpio.cleanup()
         
 def Temperature(pin):
-    gpio.setmode(gpio.BCM)
+    '''gpio.setmode(gpio.BCM)
     gpio.setup(pin,gpio.IN)
     try:
         while True:
@@ -51,8 +51,41 @@ def Temperature(pin):
             RestRequestsTemp();time.sleep(12)
 
     finally:
-        gpio.cleanup()
-        
+        gpio.cleanup()'''
+    analogPin = pin # A0 connected to A0
+    digitalPin = 16 # D0 connected to A1 - not needed
+    
+    spi = spidev.SpiDev()
+    spi.open(0,0)
+    
+    gpio.setwarnings(False)
+    gpio.setmode(gpio.BCM)
+    gpio.setup(digitalPin, gpio.IN, pull_up_down=gpio.PUD_DOWN)
+    
+    def readadc(adcnum):
+    	# read SPI data from MCP3004 chip, 4 possible adc’s (0 thru 3)
+    	if ((adcnum > 3) or (adcnum < 0)):
+    		return-1
+    	r = spi.xfer2([1,8+adcnum <<4,0])
+    	#print(r)
+    	adcout = ((r[1] &3) <<8)+r[2]
+    	return adcout
+    
+    tolerance = 0.5 # degrees
+    value = readadc(analogPin)
+    # calibrate the formula with a termometer
+    lasttemp = 125.315 - 0.175529 * value # formula made through Wolfram Alpha: 'linear function (0,125);(720,0);(1023,-55)', where (readvalue, temperature)
+    print('Temperature: %5.2f' % lasttemp)
+    while True:
+    	value = readadc(analogPin)
+    	digital = gpio.input(digitalPin)
+    	temp = 125.315 - 0.175529 * value
+    	if ((temp > lasttemp + tolerance) or (temp < lasttemp - tolerance)): # if temperature changed more than the tolerance
+    		print('New temperature: %5.2fC (input: a: %3d, d: %3d)' % (temp, value, digital))
+    		lasttemp = temp
+    	time.sleep(0.1)
+    
+    print('done.')
 def RestRequestsDHT():
     petition = requests.post(url+"DHT/"+data[0]+"&"+data[1])
     if petition.status_code == 200:
@@ -71,7 +104,7 @@ def RestRequestsTemp():
 def main():
     tempHum = threading.Thread(target=DHT,args=(Adafruit_DHT.DHT22,21,))
     rain= threading.Thread(target=Water,args=(20,))
-    temp= threading.Thread(target=Temperature,args=(16,))
+    temp= threading.Thread(target=Temperature,args=(2,))
     tempHum.start()
     rain.start()
     temp.start()
