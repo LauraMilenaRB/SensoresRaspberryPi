@@ -16,7 +16,6 @@ data=[1,2,3,4]
 
 url = "http://192.168.0.15:8080/sensors/"
 def DHT(sensor, pin):
-    
     while True:
         temp, hum = Adafruit_DHT.read_retry(sensor, pin)
         if(temp!=data[0] or hum!=data[1]):
@@ -41,14 +40,16 @@ def Water(pin):
     finally:
         gpio.cleanup()
         
-def Water(pin):
+def Temperature(pin):
     gpio.setmode(gpio.BOARD)
     gpio.setup(pin,gpio.IN)
     try:
         while True:
             if (gpio.input(pin)==0):
-                data[2]="true"
-                print("rain")
+                data[3]="false"
+                print("temp")
+            RestRequestsTemp()
+
     finally:
         gpio.cleanup()
         
@@ -62,10 +63,17 @@ def RestRequestsWater():
     if petition.status_code == 200:
         print(petition.text)
         
+def RestRequestsTemp():
+    petition = requests.post(url+"temperature/"+data[3])
+    if petition.status_code == 200:
+        print(petition.text)
+        
 def main():
-    t = threading.Thread(target=DHT,args=(Adafruit_DHT.DHT11,2,))
-    t2= threading.Thread(target=Water,args=(3,))
-    t.start()
-    t2.start()
+    tempHum = threading.Thread(target=DHT,args=(Adafruit_DHT.DHT11,2,))
+    rain= threading.Thread(target=Water,args=(3,))
+    temp= threading.Thread(target=Temperature,args=(4,))
+    tempHum.start()
+    rain.start()
+    temp.start()
     if __name__:"main"
 
