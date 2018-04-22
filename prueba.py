@@ -12,43 +12,43 @@ import time
 import RPi.GPIO as gpio
 
     
-data=[1,2,3,4]
+data=[" "," "," "," "]
 
 url = "http://192.168.0.15:8080/sensors/"
 def DHT(sensor, pin):
     while True:
-        temp, hum = Adafruit_DHT.read_retry(sensor, pin)
-        if(temp!=data[0] or hum!=data[1]):
-            data[0]=str(float(round(temp,1)))
-            data[1]=str(float(round(hum,1)))
+        temp,hum = Adafruit_DHT.read_retry(sensor, pin)
+        if(str(temp)!=data[0] or str(hum)!=data[1]):
+            data[0]=str(temp)
+            data[1]=str(hum)
             RestRequestsDHT()
         time.sleep(12)
         
 def Water(pin):
-    gpio.setmode(gpio.BOARD)
+    gpio.setmode(gpio.BCM)
     gpio.setup(pin,gpio.IN)
     try:
         while True:
             state=gpio.input(pin)
-            if((data[2]=="true" and state==1) or (data[2]=="true" and state==0)):
+            if((data[2]=="true" and state==1) or (data[2]=="false" and state==0) or (data[2]==" ")):
                 if not(gpio.input(pin)):
                     data[2]="true"
                 else:
                     data[2]="false"
                 RestRequestsWater()
-            time.sleep(8)
+            time.sleep(5)
     finally:
         gpio.cleanup()
         
 def Temperature(pin):
-    gpio.setmode(gpio.BOARD)
+    gpio.setmode(gpio.BCM)
     gpio.setup(pin,gpio.IN)
     try:
         while True:
             if (gpio.input(pin)==0):
                 data[3]="false"
-                print("temp")
-            RestRequestsTemp()
+            print("temp",gpio.input(pin))
+            RestRequestsTemp();time.sleep(12)
 
     finally:
         gpio.cleanup()
@@ -69,9 +69,9 @@ def RestRequestsTemp():
         print(petition.text)
         
 def main():
-    tempHum = threading.Thread(target=DHT,args=(Adafruit_DHT.DHT11,2,))
-    rain= threading.Thread(target=Water,args=(3,))
-    temp= threading.Thread(target=Temperature,args=(4,))
+    tempHum = threading.Thread(target=DHT,args=(Adafruit_DHT.DHT22,21,))
+    rain= threading.Thread(target=Water,args=(20,))
+    temp= threading.Thread(target=Temperature,args=(16,))
     tempHum.start()
     rain.start()
     temp.start()
