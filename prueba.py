@@ -13,13 +13,14 @@ import RPi.GPIO as gpio
 
     
 data=[1,2,3,4]
+
 url = "http://192.168.0.15:8080/sensors/"
 def DHT(sensor, pin):
     
     while True:
         temp, hum = Adafruit_DHT.read_retry(sensor, pin)
-        data[0]=round(temp,1)
-        data[1]=round(hum,1)
+        data[0]=str(float(round(temp,1)))
+        data[1]=str(float(round(hum,1)))
         RestRequestsDHT()
         time.sleep(15)
         
@@ -28,21 +29,20 @@ def Water(pin):
     gpio.setup(pin,gpio.IN)
     try:
         while True:
-            state=bool(gpio.input(pin))
-            if (not(state)):
-                data[2]=state
+            if (gpio.input(pin)==0):
+                data[2]="true"
                 RestRequestsWater()
                 print("rain")
     finally:
         gpio.cleanup()
         
 def RestRequestsDHT():
-    petition = requests.post(url+"DHT/"+str(data[0])+"&"+str(data[1]))
+    petition = requests.post(url+"DHT/"+data[0]+"&"+data[1])
     if petition.status_code == 200:
         print(petition.text)
         
 def RestRequestsWater():
-    petition = requests.post(url+"water/"+str(data[2]))
+    petition = requests.post(url+"water/"+data[2])
     if petition.status_code == 200:
         print(petition.text)
         
