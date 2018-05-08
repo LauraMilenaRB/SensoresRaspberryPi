@@ -10,13 +10,14 @@ import requests
 import threading
 import time
 import RPi.GPIO as gpio
+import socket
 import spidev
 import geocoder
     
 data=["","","",""]
-g=geocoder.p('me')
+g=geocoder.ip('me')
 url = "http://192.168.0.15:8080/sensors/"
-ip=socket.gethostbyname(socket.gethostname())
+ip=socket.gethostbyname(socket.gethostname())+"01"
 def DHT(sensor, pin):
     while True:
         temp,hum = Adafruit_DHT.read_retry(sensor, pin)
@@ -89,17 +90,17 @@ def Temperature(pin):
     
     print('done.')
 def RestRequestsDHT():
-    petition = requests.post(url+"DHT/"+ip+"/"+g.lat+"&"+g.lng+"/"+data[0]+"&"+data[1])
+    petition = requests.post(url+"DHT/"+ip+"/"+str(g.lat)+"&"+str(g.lng)+"/"+data[0]+"&"+data[1])
     if petition.status_code == 200:
         print(petition.text)
         
 def RestRequestsWater():
-    petition = requests.post(url+"water/"+ip+"/"+g.lat+"&"+g.lng+"/"+data[2])
+    petition = requests.post(url+"water/"+ip+"/"+str(g.lat)+"&"+str(g.lng)+"/"+data[2])
     if petition.status_code == 200:
         print(petition.text)
         
 def RestRequestsTemp():
-    petition = requests.post(url+"temperature/"+ip+"/"+g.lat+"&"+g.lng+"/"+data[3])
+    petition = requests.post(url+"temperature/"+ip+"/"+str(g.lat)+"&"+str(g.lng)+"/"+data[3])
     if petition.status_code == 200:
         print(petition.text)
         
