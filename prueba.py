@@ -16,7 +16,7 @@ import geocoder
     
 data=["","","",""]
 g=geocoder.ip('me')
-url = "http://192.168.0.15:8080/sensors/"
+url = "http://35.166.65.91:8080/sensors/"
 ip=socket.gethostbyname(socket.gethostname())+"01"
 def DHT(sensor, pin):
     while True:
